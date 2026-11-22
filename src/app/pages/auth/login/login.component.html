@@ -1,0 +1,112 @@
+<div class="login-container">
+  <div class="login-welcome">
+    <h1 class="login-title">{{ 'auth.signInTitle' | translate }}</h1>
+    <p class="login-subtitle">{{ 'auth.signInSubtitle' | translate }}</p>
+  </div>
+
+  @if (errorMessage) {
+    <nz-alert
+      class="login-alert"
+      nzType="error"
+      nzShowIcon
+      [nzMessage]="errorMessage"
+      nzCloseable
+      (nzOnClose)="errorMessage = null"
+    ></nz-alert>
+  }
+
+  <form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form" novalidate>
+    @if (showTenant) {
+      <nz-form-item>
+        <nz-form-label nzFor="tenantCode">{{ 'auth.tenantCode' | translate }}</nz-form-label>
+        <nz-form-control [nzExtra]="'auth.tenantCodeHint' | translate">
+          <nz-input-group nzSize="large" [nzPrefix]="tenantIcon">
+            <input
+              nz-input
+              id="tenantCode"
+              formControlName="tenantCode"
+              autocomplete="organization"
+              [placeholder]="'auth.tenantCodePlaceholder' | translate"
+            />
+          </nz-input-group>
+          <ng-template #tenantIcon><span nz-icon nzType="apartment"></span></ng-template>
+        </nz-form-control>
+      </nz-form-item>
+    }
+
+    <nz-form-item>
+      <nz-form-label nzFor="username" nzRequired>{{ 'auth.usernameLabel' | translate }}</nz-form-label>
+      <nz-form-control [nzErrorTip]="'auth.usernameRequired' | translate">
+        <nz-input-group nzSize="large" [nzPrefix]="userIcon">
+          <input
+            nz-input
+            id="username"
+            formControlName="username"
+            autocomplete="username"
+            autofocus
+            [placeholder]="'auth.usernamePlaceholder' | translate"
+          />
+        </nz-input-group>
+        <ng-template #userIcon><span nz-icon nzType="user"></span></ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-label nzFor="password" nzRequired>{{ 'auth.passwordLabel' | translate }}</nz-form-label>
+      <nz-form-control [nzErrorTip]="'auth.passwordRequired' | translate">
+        <nz-input-group nzSize="large" [nzPrefix]="lockIcon" [nzSuffix]="eyeIcon">
+          <input
+            nz-input
+            id="password"
+            formControlName="password"
+            autocomplete="current-password"
+            [type]="showPassword ? 'text' : 'password'"
+            [placeholder]="'auth.passwordPlaceholder' | translate"
+            (keyup)="onPasswordKey($event)"
+            (keydown)="onPasswordKey($event)"
+          />
+        </nz-input-group>
+        <ng-template #lockIcon><span nz-icon nzType="lock"></span></ng-template>
+        <ng-template #eyeIcon>
+          <span
+            nz-icon
+            class="password-toggle"
+            [nzType]="showPassword ? 'eye-invisible' : 'eye'"
+            role="button"
+            [attr.aria-label]="(showPassword ? 'auth.hidePassword' : 'auth.showPassword') | translate"
+            (click)="showPassword = !showPassword"
+          ></span>
+        </ng-template>
+        @if (capsLockOn) {
+          <div class="caps-warning">
+            <span nz-icon nzType="warning"></span> {{ 'auth.capsLockOn' | translate }}
+          </div>
+        }
+      </nz-form-control>
+    </nz-form-item>
+
+    <div class="login-options">
+      <label nz-checkbox formControlName="remember">{{ 'auth.rememberMe' | translate }}</label>
+      <a class="tenant-toggle" (click)="toggleTenant()">
+        {{ (showTenant ? 'auth.hideTenant' : 'auth.loginWithTenant') | translate }}
+      </a>
+    </div>
+
+    <button
+      nz-button
+      nzType="primary"
+      nzSize="large"
+      nzBlock
+      type="submit"
+      class="login-btn"
+      [nzLoading]="loading"
+    >
+      {{ (loading ? 'auth.signingIn' : 'auth.signIn') | translate }}
+    </button>
+  </form>
+
+  <p class="login-help">
+    <span nz-icon nzType="info-circle"></span>
+    {{ 'auth.forgotHint' | translate }}
+  </p>
+</div>

@@ -1,0 +1,90 @@
+<nz-header class="admin-navbar">
+  <div class="navbar-left">
+    <button
+      class="navbar-toggle"
+      nz-icon
+      [nzType]="collapsed ? 'menu-unfold' : 'menu-fold'"
+      nzTheme="outline"
+      (click)="toggleSidebar()"
+    ></button>
+    <app-breadcrumb></app-breadcrumb>
+  </div>
+  <div class="navbar-right">
+    <app-search-box></app-search-box>
+    <app-change-language></app-change-language>
+    <app-toggle-theme></app-toggle-theme>
+    <app-fullscreen></app-fullscreen>
+    <button
+      class="navbar-action"
+      nz-icon
+      nzType="setting"
+      nzTheme="outline"
+      (click)="openSettings()"
+    ></button>
+    <div class="user-dropdown" nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click">
+      <nz-avatar [nzText]="avatarText" class="user-avatar"></nz-avatar>
+    </div>
+    <nz-dropdown-menu #userMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item nzDisabled>
+          <div class="user-menu-info">
+            <strong>{{ displayName }}</strong>
+            <small>{{ user?.email || user?.username }}</small>
+            @if (user?.isPlatformAdmin) {
+              <nz-tag nzColor="geekblue">{{ 'navbar.platformAdmin' | translate }}</nz-tag>
+            } @else if (user?.tenantName; as tenantName) {
+              <nz-tag>{{ tenantName }}</nz-tag>
+            }
+          </div>
+        </li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item (click)="openChangePasswordModal()">
+          <span nz-icon nzType="key" nzTheme="outline"></span>
+          {{ 'navbar.changePassword' | translate }}
+        </li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item nzDanger (click)="logout()">
+          <span nz-icon nzType="logout" nzTheme="outline"></span> {{ 'navbar.logout' | translate }}
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+  </div>
+</nz-header>
+
+<nz-modal
+  [(nzVisible)]="changePasswordVisible"
+  [nzTitle]="'navbar.changePasswordTitle' | translate"
+  (nzOnCancel)="closeChangePasswordModal()"
+  (nzOnOk)="submitChangePassword()"
+  [nzOkLoading]="changePasswordLoading"
+  [nzOkText]="'auth.updatePassword' | translate"
+  nzWidth="460px"
+  [nzCentered]="true"
+>
+  <ng-container *nzModalContent>
+    @if (changePasswordError) {
+      <nz-alert nzType="error" nzShowIcon [nzMessage]="changePasswordError" class="mb-16"></nz-alert>
+    }
+    <form nz-form nzLayout="vertical" (ngSubmit)="submitChangePassword()">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'auth.oldPassword' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input nz-input type="password" name="oldPassword" autocomplete="current-password" [(ngModel)]="oldPassword" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'auth.newPassword' | translate }}</nz-form-label>
+        <nz-form-control [nzExtra]="'auth.passwordPolicyHint' | translate">
+          <input nz-input type="password" name="newPassword" autocomplete="new-password" [(ngModel)]="newPassword" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'auth.confirmPassword' | translate }}</nz-form-label>
+        <nz-form-control>
+          <input nz-input type="password" name="confirmPassword" autocomplete="new-password" [(ngModel)]="confirmPassword" />
+        </nz-form-control>
+      </nz-form-item>
+      <button type="submit" hidden></button>
+    </form>
+  </ng-container>
+</nz-modal>
