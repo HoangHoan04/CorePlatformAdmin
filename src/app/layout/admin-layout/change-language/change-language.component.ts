@@ -1,4 +1,6 @@
 import { DashboardService, DashboardSettings } from '@/app/core/services';
+import { ActiveLanguage } from '@/app/core/models/i18n.models';
+import { AppLanguageService } from '@/app/core/services/app-language.service';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -11,9 +13,13 @@ import { Subscription } from 'rxjs';
 })
 export class ChangeLanguageComponent implements OnInit, OnDestroy {
   s: DashboardSettings;
+  languages: ActiveLanguage[] = [];
   private sub = new Subscription();
 
-  constructor(private dashboardService: DashboardService) {
+  constructor(
+    private dashboardService: DashboardService,
+    readonly langSvc: AppLanguageService,
+  ) {
     this.s = dashboardService.snapshot;
   }
 
@@ -21,15 +27,31 @@ export class ChangeLanguageComponent implements OnInit, OnDestroy {
     this.sub.add(
       this.dashboardService.settings$.subscribe((settings) => {
         this.s = settings;
+        this.langSvc.applyDocumentLanguage(settings.language);
       }),
     );
+    this.sub.add(
+      this.langSvc.languages$.subscribe((list) => {
+        this.languages = list;
+        this.langSvc.applyDocumentLanguage(this.s.language);
+      }),
+    );
+    this.langSvc.load();
   }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  setLanguage(lang: 'vi' | 'en'): void {
-    this.dashboardService.updateSettings({ language: lang });
+  get current(): ActiveLanguage | undefined {
+    return this.langSvc.find(this.s.language);
+  }
+
+  isCurrent(code: string): boolean {
+    return this.langSvc.isSame(code, this.s.language);
+  }
+
+  setLanguage(code: string): void {
+    this.dashboardService.updateSettings({ language: code });
   }
 }

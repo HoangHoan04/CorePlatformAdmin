@@ -1,0 +1,14 @@
+.currency-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currency-symbol {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 4px;
+  text-align: center;
+  background: var(--muted, rgba(0, 0, 0, 0.04));
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.55));
+}

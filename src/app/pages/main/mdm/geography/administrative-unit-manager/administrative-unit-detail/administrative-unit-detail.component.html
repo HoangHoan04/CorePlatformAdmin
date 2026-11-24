@@ -1,0 +1,114 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="720"
+  [nzTitle]="'mdm.adminUnit.detailTitle' | translate"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <nz-spin [nzSpinning]="loading">
+      @if (unit; as u) {
+        <div class="detail-header">
+          <div>
+            <div class="detail-name">{{ u.name }}</div>
+            <div class="detail-sub">{{ u.fullName }}</div>
+          </div>
+          <div class="detail-tags">
+            <nz-tag nzColor="blue">{{ typeKey(u.unitType) | translate }}</nz-tag>
+            <nz-tag [nzColor]="u.isActive ? 'success' : 'error'">
+              {{ (u.isActive ? 'common.statusActive' : 'common.statusInactive') | translate }}
+            </nz-tag>
+          </div>
+        </div>
+
+        <nz-descriptions nzBordered [nzColumn]="2" nzSize="small">
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.code' | translate">
+            <strong>{{ u.code }}</strong>
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.countryCode' | translate">
+            {{ u.countryCode }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.parent' | translate">
+            {{ u.parentName || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.level' | translate">
+            {{ u.level }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.path' | translate">
+            {{ u.path || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.childCount' | translate">
+            {{ u.childCount }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.nameEn' | translate">
+            {{ u.nameEn || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.phoneAreaCode' | translate">
+            {{ u.phoneAreaCode || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.postalCode' | translate">
+            {{ u.postalCode || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.coordinates' | translate">
+            {{ u.latitude != null && u.longitude != null ? u.latitude + ', ' + u.longitude : '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.effectiveFrom' | translate">
+            {{ u.effectiveFrom ? (u.effectiveFrom | date: 'dd/MM/yyyy') : '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnit.effectiveTo' | translate">
+            {{ u.effectiveTo ? (u.effectiveTo | date: 'dd/MM/yyyy') : '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.createdAt' | translate">
+            {{ u.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.updatedAt' | translate">
+            {{ u.updatedAt ? (u.updatedAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+          </nz-descriptions-item>
+        </nz-descriptions>
+
+        @if (canViewMappings) {
+          <nz-divider [nzText]="'mdm.adminUnit.mappingHistory' | translate" nzOrientation="left"></nz-divider>
+          @if (mappings.length) {
+            <nz-timeline>
+              @for (m of mappings; track m.id) {
+                <nz-timeline-item [nzColor]="m.newUnitId === u.id ? 'green' : 'gray'">
+                  <div class="mapping-line">
+                    <span class="mapping-date">{{ m.effectiveDate | date: 'dd/MM/yyyy' }}</span>
+                    <nz-tag>{{ mappingTypeKey(m.mappingType) | translate }}</nz-tag>
+                  </div>
+                  <div>
+                    <span [class.mapping-self]="m.oldUnitId === u.id">{{ m.oldUnitName }}</span>
+                    <span nz-icon nzType="arrow-right" class="mapping-arrow"></span>
+                    <span [class.mapping-self]="m.newUnitId === u.id">{{ m.newUnitName }}</span>
+                  </div>
+                  @if (m.legalReference) {
+                    <div class="detail-sub">{{ m.legalReference }}</div>
+                  }
+                </nz-timeline-item>
+              }
+            </nz-timeline>
+          } @else {
+            <nz-empty nzNotFoundImage="simple" [nzNotFoundContent]="'mdm.adminUnit.noMapping' | translate"></nz-empty>
+          }
+        }
+      } @else if (!loading) {
+        <nz-empty></nz-empty>
+      }
+    </nz-spin>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" (click)="close()">
+      {{ 'common.actions.close' | translate }}
+    </button>
+    @if (canEdit && unit) {
+      <button nz-button nzType="primary" type="button" (click)="onEdit()">
+        <span nz-icon nzType="edit"></span>
+        {{ 'table.action.edit' | translate }}
+      </button>
+    }
+  </div>
+</ng-template>

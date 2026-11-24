@@ -1,0 +1,48 @@
+<app-filter-custom
+  [id]="'currency-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'currency-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'160px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Cột mã: mã ISO + ký hiệu -->
+<ng-template #codeTpl let-row>
+  <span class="currency-code">
+    <strong>{{ row.code }}</strong>
+    <span class="currency-symbol">{{ row.symbol }}</span>
+  </span>
+</ng-template>
+
+<app-currency-detail
+  [(visible)]="detailVisible"
+  [currencyId]="detailId"
+  [canEdit]="canUpdate"
+  (edit)="openEdit($event)"
+></app-currency-detail>
+
+<app-add-or-update-currency
+  [(visible)]="formVisible"
+  [currency]="editing"
+  [nextSortOrder]="nextSortOrder"
+  (saved)="onSaved()"
+></app-add-or-update-currency>

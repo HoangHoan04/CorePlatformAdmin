@@ -248,6 +248,15 @@ $blur-intensity: 80px;
       color: #1c1917;
       letter-spacing: -0.8px;
     }
+
+    .auth-brand-sub {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: $primary-color;
+      background: rgba($primary-color, 0.08);
+    }
   }
 
   .auth-card {

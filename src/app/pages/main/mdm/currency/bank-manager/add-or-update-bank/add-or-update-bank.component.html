@@ -1,0 +1,115 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="680"
+  [nzTitle]="(isEdit ? 'mdm.bank.editTitle' : 'mdm.bank.createTitle') | translate"
+  [nzMaskClosable]="false"
+  [nzClosable]="!saving"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.bank.countryCode' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="countryCode" nzShowSearch>
+                @for (c of countries; track c.id) {
+                  <nz-option [nzValue]="c.code" [nzLabel]="c.code + ' — ' + c.name"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.bank.code' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.bank.codeInvalid' | translate">
+              <input nz-input formControlName="code" maxlength="20" class="uppercase" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.bank.shortName' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.bank.shortNameRequired' | translate">
+              <input nz-input formControlName="shortName" maxlength="100" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'mdm.bank.name' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'mdm.bank.nameRequired' | translate">
+          <input nz-input formControlName="name" maxlength="255" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.bank.supportsVietqr' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="supportsVietqr"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label [nzRequired]="!!form.value.supportsVietqr">{{ 'mdm.bank.bin' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.bank.binInvalid' | translate">
+              <input nz-input formControlName="bin" maxlength="6" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.bank.swiftCode' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.bank.swiftCodeInvalid' | translate">
+              <input nz-input formControlName="swiftCode" maxlength="11" class="uppercase" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>{{ 'mdm.bank.logoUrl' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'mdm.bank.logoUrlInvalid' | translate">
+          <input nz-input formControlName="logoUrl" maxlength="500" placeholder="https://" />
+        </nz-form-control>
+      </nz-form-item>
+      @if (form.value.logoUrl && form.get('logoUrl')!.valid) {
+        <div class="logo-preview">
+          @if (!logoError) {
+            <img [src]="form.value.logoUrl" alt="logo" (error)="logoError = true" />
+          } @else {
+            <span class="text-muted">{{ 'mdm.bank.logoLoadFailed' | translate }}</span>
+          }
+        </div>
+      }
+
+      <nz-form-item>
+        <nz-form-label>{{ 'mdm.bank.isActive' | translate }}</nz-form-label>
+        <nz-form-control>
+          <nz-switch formControlName="isActive"></nz-switch>
+        </nz-form-control>
+      </nz-form-item>
+      <button type="submit" hidden></button>
+    </form>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" [disabled]="saving" (click)="close()">
+      {{ 'common.actions.cancel' | translate }}
+    </button>
+    <button nz-button nzType="primary" type="button" [nzLoading]="saving" (click)="submit()">
+      <span nz-icon nzType="save"></span>
+      {{ 'common.actions.save' | translate }}
+    </button>
+  </div>
+</ng-template>

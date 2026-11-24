@@ -1,4 +1,5 @@
 import { DashboardService, DashboardSettings } from '@/app/core/services';
+import { AppLanguageService } from '@/app/core/services/app-language.service';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -126,8 +127,10 @@ export class ConfigSettingComponent implements OnInit, OnDestroy {
     private readonly translate: TranslateService,
     private readonly message: NzMessageService,
     private readonly cdr: ChangeDetectorRef,
+    readonly langSvc: AppLanguageService,
   ) {
     this.s = ds.snapshot;
+    this.langSvc.load();
   }
 
   ngOnInit(): void {

@@ -1,0 +1,67 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="580"
+  [nzTitle]="'mdm.exchangeRate.detailTitle' | translate"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <nz-spin [nzSpinning]="loading">
+      @if (rate; as r) {
+        <div class="rate-hero">
+          <div class="rate-hero-main">
+            1 {{ r.fromCurrency }} = <strong>{{ r.rate | number: '1.0-8' }}</strong> {{ r.toCurrency }}
+          </div>
+          @if (inverse) {
+            <div class="rate-hero-sub">
+              1 {{ r.toCurrency }} = {{ inverse | number: '1.0-8' }} {{ r.fromCurrency }}
+            </div>
+          }
+          <div class="rate-hero-tags">
+            <nz-tag>{{ rateTypeKey(r.rateType) | translate }}</nz-tag>
+            @if (r.isShared) {
+              <nz-tag nzColor="blue">{{ 'mdm.exchangeRate.shared' | translate }}</nz-tag>
+            } @else {
+              <nz-tag nzColor="purple">{{ 'mdm.exchangeRate.tenantOwn' | translate }}</nz-tag>
+            }
+          </div>
+        </div>
+
+        <nz-descriptions nzBordered [nzColumn]="1" nzSize="small">
+          <nz-descriptions-item [nzTitle]="'mdm.exchangeRate.effectiveAt' | translate">
+            {{ r.effectiveAt | date: 'dd/MM/yyyy HH:mm' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.exchangeRate.source' | translate">
+            {{ r.source }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.exchangeRate.note' | translate">
+            {{ r.note || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.createdAt' | translate">
+            {{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.updatedAt' | translate">
+            {{ r.updatedAt ? (r.updatedAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+          </nz-descriptions-item>
+        </nz-descriptions>
+      } @else if (!loading) {
+        <nz-empty></nz-empty>
+      }
+    </nz-spin>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" (click)="close()">
+      {{ 'common.actions.close' | translate }}
+    </button>
+    @if (showEdit) {
+      <button nz-button nzType="primary" type="button" (click)="onEdit()">
+        <span nz-icon nzType="edit"></span>
+        {{ 'table.action.edit' | translate }}
+      </button>
+    }
+  </div>
+</ng-template>

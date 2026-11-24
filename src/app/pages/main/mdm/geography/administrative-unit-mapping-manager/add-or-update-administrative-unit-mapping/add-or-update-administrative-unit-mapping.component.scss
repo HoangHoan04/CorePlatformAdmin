@@ -1,0 +1,27 @@
+nz-form-item {
+  margin-bottom: 16px;
+}
+
+.mapping-units {
+  padding: 12px 16px 0;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  background: var(--muted, rgba(0, 0, 0, 0.03));
+}
+
+.mapping-arrow {
+  text-align: center;
+  margin: -8px 0 4px;
+  font-size: 16px;
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.w-full {
+  width: 100%;
+}

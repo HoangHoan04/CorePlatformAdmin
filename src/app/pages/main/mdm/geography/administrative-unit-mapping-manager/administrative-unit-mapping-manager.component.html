@@ -1,0 +1,55 @@
+<app-filter-custom
+  [id]="'admin-unit-mapping-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'admin-unit-mapping-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'130px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Đơn vị cũ / mới: mã + tên đầy đủ -->
+<ng-template #oldUnitTpl let-row>
+  <div class="unit-cell">
+    <strong>{{ row.oldUnitCode }}</strong>
+    <span class="unit-cell-name">{{ row.oldUnitName }}</span>
+  </div>
+</ng-template>
+
+<ng-template #newUnitTpl let-row>
+  <div class="unit-cell">
+    <strong>{{ row.newUnitCode }}</strong>
+    <span class="unit-cell-name">{{ row.newUnitName }}</span>
+  </div>
+</ng-template>
+
+<app-administrative-unit-mapping-detail
+  [(visible)]="detailVisible"
+  [mappingId]="detailId"
+  [canEdit]="canUpdate"
+  (edit)="openEdit($event)"
+></app-administrative-unit-mapping-detail>
+
+<app-add-or-update-administrative-unit-mapping
+  [(visible)]="formVisible"
+  [mapping]="editing"
+  [defaultCountryCode]="filters['countryCode']"
+  (saved)="onSaved()"
+></app-add-or-update-administrative-unit-mapping>

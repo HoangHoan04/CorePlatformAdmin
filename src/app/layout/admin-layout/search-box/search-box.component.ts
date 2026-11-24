@@ -58,7 +58,7 @@ export class SearchBoxComponent implements OnInit, OnDestroy {
         const route = config[key];
         if (route.path) {
           items.push({
-            label: route.translationKey,
+            label: route.label,
             path: route.path,
             icon: route.icon || 'file-text',
           });

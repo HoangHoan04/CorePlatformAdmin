@@ -1,0 +1,37 @@
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-logo {
+  height: 40px;
+  max-width: 96px;
+  object-fit: contain;
+}
+
+.detail-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-sub {
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+}
+
+.detail-tags {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

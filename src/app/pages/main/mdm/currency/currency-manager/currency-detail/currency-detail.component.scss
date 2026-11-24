@@ -1,0 +1,39 @@
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-symbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  background: var(--muted, rgba(0, 0, 0, 0.04));
+}
+
+.detail-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-sub {
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-status {
+  margin-left: auto;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

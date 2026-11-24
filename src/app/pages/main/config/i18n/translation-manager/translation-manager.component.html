@@ -1,0 +1,236 @@
+<!-- Tiến độ dịch theo ngôn ngữ -->
+<nz-card class="i18n-stats" [nzBordered]="false">
+  <div class="i18n-stats-row">
+    <div class="i18n-stat-total">
+      <span class="i18n-stat-label">{{ 'i18n.translation.totalKeys' | translate }}</span>
+      <span class="i18n-stat-value">{{ stats.totalKeys }}</span>
+    </div>
+    @for (lang of languages; track lang.code) {
+      <div class="i18n-stat-lang" [class.inactive]="!lang.isActive">
+        <div class="i18n-stat-lang-head">
+          <span class="i18n-stat-lang-name">
+            {{ lang.nativeName }} <span class="i18n-stat-code">{{ lang.code }}</span>
+            @if (lang.isDefault) {
+              <span nz-icon nzType="star" nzTheme="fill" class="i18n-star"></span>
+            }
+          </span>
+          <span class="i18n-stat-count">{{ translatedCount(lang.code) }}/{{ stats.totalKeys }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="percent(lang.code)"
+          nzSize="small"
+          [nzStatus]="percent(lang.code) >= 100 ? 'success' : 'normal'"
+        ></nz-progress>
+      </div>
+    }
+  </div>
+  @if (stats.totalKeys === 0 && !loading) {
+    <nz-alert
+      class="i18n-empty-hint"
+      nzType="info"
+      nzShowIcon
+      [nzMessage]="'i18n.translation.emptyHint' | translate"
+    ></nz-alert>
+  }
+</nz-card>
+
+<app-filter-custom
+  [id]="'translation-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'translation-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'100px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  [toolbarRightContent]="dirtyTpl"
+  [emptyText]="'i18n.translation.noKeys'"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<ng-template #dirtyTpl>
+  @if (dirtyCount > 0) {
+    <nz-tag nzColor="orange" class="dirty-tag">
+      <span nz-icon nzType="edit"></span>
+      {{ 'i18n.translation.unsaved' | translate: { count: dirtyCount } }}
+    </nz-tag>
+  }
+</ng-template>
+
+<!-- Cột khóa -->
+<ng-template #keyTpl let-row>
+  <div class="key-cell">
+    <div class="key-line">
+      <code class="key-text" [title]="row.fullKey">{{ row.fullKey }}</code>
+      <button
+        type="button"
+        class="key-copy"
+        nz-tooltip
+        [nzTooltipTitle]="'i18n.translation.copyKey' | translate"
+        (click)="copyKey(row.fullKey, $event)"
+      >
+        <span nz-icon nzType="copy"></span>
+      </button>
+    </div>
+    @if (row.description) {
+      <div class="key-desc" [title]="row.description">{{ row.description }}</div>
+    }
+    <div class="key-tags">
+      @for (p of row.platforms; track p) {
+        <span class="key-platform">{{ p }}</span>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- Ô bản dịch theo ngôn ngữ (column.field = lang__{code}) -->
+<ng-template #valueTpl let-row let-col="column">
+  @let lang = langOf(col.field);
+  <div class="value-cell" [class.dirty]="isDirty(row, lang)" [class.missing]="!cellValue(row, lang)">
+    <textarea
+      nz-input
+      [nzAutosize]="{ minRows: 1, maxRows: 5 }"
+      [ngModel]="cellValue(row, lang)"
+      (ngModelChange)="onCellChange(row, lang, $event)"
+      [placeholder]="'i18n.translation.notTranslated' | translate"
+      [attr.dir]="language(lang)?.direction === 'RTL' ? 'rtl' : null"
+      [disabled]="!canEdit"
+    ></textarea>
+    <div class="value-flags">
+      @if (isUnreviewed(row, lang)) {
+        <span
+          class="flag-unreviewed"
+          nz-tooltip
+          [nzTooltipTitle]="'i18n.translation.unreviewedHint' | translate"
+        ></span>
+      }
+      @if (!cellValue(row, lang) && defaultLanguageCode && lang !== defaultLanguageCode && cellValue(row, defaultLanguageCode)) {
+        <button
+          type="button"
+          class="value-copy"
+          nz-tooltip
+          [nzTooltipTitle]="'i18n.translation.copyFromDefault' | translate"
+          (click)="copyFromDefault(row, lang)"
+        >
+          <span nz-icon nzType="import"></span>
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- Modal tạo / sửa khóa dịch -->
+<nz-modal
+  [nzVisible]="keyModalVisible"
+  [nzTitle]="(editingKey ? 'i18n.translation.editKey' : 'i18n.translation.addKey') | translate"
+  [nzWidth]="720"
+  [nzMaskClosable]="false"
+  [nzOkText]="'common.actions.save' | translate"
+  [nzCancelText]="'common.actions.cancel' | translate"
+  [nzOkLoading]="keySaving"
+  (nzOnOk)="submitKey()"
+  (nzOnCancel)="closeKeyModal()"
+>
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="keyForm" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzRequired>{{ 'i18n.translation.key' | translate }}</nz-form-label>
+        <nz-form-control [nzErrorTip]="'i18n.translation.keyInvalid' | translate">
+          <input nz-input formControlName="fullKey" placeholder="common.actions.save" class="mono" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label>{{ 'i18n.translation.description' | translate }}</nz-form-label>
+        <nz-form-control>
+          <textarea nz-input formControlName="description" [nzAutosize]="{ minRows: 1, maxRows: 3 }"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label>{{ 'i18n.translation.platforms' | translate }}</nz-form-label>
+        <nz-form-control>
+          @for (p of platforms; track p) {
+            <label nz-checkbox [ngModel]="hasPlatform(p)" [ngModelOptions]="{ standalone: true }" (ngModelChange)="togglePlatform(p, $event)">
+              {{ p }}
+            </label>
+          }
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+
+    <nz-divider [nzText]="'i18n.translation.values' | translate" nzOrientation="left"></nz-divider>
+    @for (lang of languages; track lang.code) {
+      <div class="key-value-row">
+        <label class="key-value-label">
+          {{ lang.nativeName }} <span class="i18n-stat-code">{{ lang.code }}</span>
+        </label>
+        <textarea
+          nz-input
+          [nzAutosize]="{ minRows: 1, maxRows: 4 }"
+          [(ngModel)]="keyValues[lang.code]"
+          [attr.dir]="lang.direction === 'RTL' ? 'rtl' : null"
+          [placeholder]="'i18n.translation.notTranslated' | translate"
+        ></textarea>
+      </div>
+    }
+  </ng-container>
+</nz-modal>
+
+<!-- Modal nhập JSON -->
+<nz-modal
+  [nzVisible]="importVisible"
+  [nzTitle]="'i18n.translation.importJson' | translate"
+  [nzWidth]="560"
+  [nzMaskClosable]="false"
+  [nzOkText]="'i18n.translation.importAction' | translate"
+  [nzCancelText]="'common.actions.cancel' | translate"
+  [nzOkLoading]="importing"
+  [nzOkDisabled]="!importData || !importLang"
+  (nzOnOk)="submitImport()"
+  (nzOnCancel)="importVisible = false"
+>
+  <ng-container *nzModalContent>
+    <div class="import-body">
+      <div class="import-row">
+        <label class="import-label">{{ 'i18n.translation.language' | translate }}</label>
+        <nz-select [(ngModel)]="importLang" class="w-full">
+          @for (lang of languages; track lang.code) {
+            <nz-option [nzValue]="lang.code" [nzLabel]="lang.nativeName + ' (' + lang.code + ')'"></nz-option>
+          }
+        </nz-select>
+      </div>
+      <div class="import-row">
+        <label class="import-label">{{ 'i18n.translation.importFile' | translate }}</label>
+        <div class="import-file">
+          <button nz-button type="button" (click)="fileInput.click()">
+            <span nz-icon nzType="paper-clip"></span>
+            {{ 'i18n.translation.chooseFile' | translate }}
+          </button>
+          <input #fileInput type="file" accept=".json,application/json" hidden (change)="onImportFile($event)" />
+          @if (importFile) {
+            <span class="import-file-name">
+              {{ importFile.name }} · {{ 'i18n.translation.importPreview' | translate: { count: importPreviewCount } }}
+            </span>
+          }
+        </div>
+      </div>
+      <label nz-checkbox [(ngModel)]="importOverwrite">{{ 'i18n.translation.importOverwrite' | translate }}</label>
+      <label nz-checkbox [(ngModel)]="importCreateKeys">{{ 'i18n.translation.importCreateKeys' | translate }}</label>
+      <nz-alert nzType="info" nzShowIcon [nzMessage]="'i18n.translation.importHint' | translate"></nz-alert>
+    </div>
+  </ng-container>
+</nz-modal>

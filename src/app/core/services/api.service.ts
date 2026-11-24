@@ -21,8 +21,15 @@ export class ApiService {
   get SYSTEM() {
     return this.endpoints.SYSTEM;
   }
-  get MASTER_DATA() {
-    return this.endpoints.MASTER_DATA;
+  get MDM() {
+    return this.endpoints.MDM;
+  }
+  get I18N() {
+    return this.endpoints.I18N;
+  }
+
+  getBlob(url: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(url, { responseType: 'blob', observe: 'response' });
   }
 
   get<T>(url: string, params?: Record<string, any>): Observable<T> {

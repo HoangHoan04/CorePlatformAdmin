@@ -1,0 +1,22 @@
+.user-menu-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 200px;
+  color: var(--foreground);
+  cursor: default;
+
+  small {
+    color: var(--muted-foreground);
+  }
+
+  nz-tag {
+    margin-top: 4px;
+  }
+}
+
+.mb-16 {
+  display: block;
+  margin-bottom: 16px;
+}

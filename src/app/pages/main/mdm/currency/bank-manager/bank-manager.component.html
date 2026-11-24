@@ -1,0 +1,63 @@
+<app-filter-custom
+  [id]="'bank-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'bank-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'160px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Logo + tên ngắn + tên đầy đủ -->
+<ng-template #nameTpl let-row>
+  <div class="bank-name">
+    @if (row.logoUrl) {
+      <img class="bank-logo" [src]="row.logoUrl" [alt]="row.shortName" loading="lazy" />
+    } @else {
+      <span class="bank-logo bank-logo-empty"><span nz-icon nzType="bank"></span></span>
+    }
+    <div class="bank-name-text">
+      <span class="bank-name-short">{{ row.shortName }}</span>
+      <span class="bank-name-full">{{ row.name }}</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #vietqrTpl let-row>
+  @if (row.supportsVietqr) {
+    <span nz-icon nzType="qrcode" class="vietqr-yes"></span>
+  } @else {
+    <span class="text-muted">-</span>
+  }
+</ng-template>
+
+<app-bank-detail
+  [(visible)]="detailVisible"
+  [bankId]="detailId"
+  [canEdit]="canUpdate"
+  (edit)="openEdit($event)"
+></app-bank-detail>
+
+<app-add-or-update-bank
+  [(visible)]="formVisible"
+  [bank]="editing"
+  [defaultCountryCode]="filters['countryCode']"
+  (saved)="onSaved()"
+></app-add-or-update-bank>

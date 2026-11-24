@@ -1,0 +1,68 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="640"
+  [nzTitle]="'mdm.adminUnitMapping.detailTitle' | translate"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <nz-spin [nzSpinning]="loading">
+      @if (mapping; as m) {
+        <div class="mapping-flow">
+          <div class="mapping-unit old">
+            <div class="mapping-unit-label">{{ 'mdm.adminUnitMapping.oldUnit' | translate }}</div>
+            <div class="mapping-unit-code">{{ m.oldUnitCode }}</div>
+            <div class="mapping-unit-name">{{ m.oldUnitName }}</div>
+          </div>
+          <div class="mapping-flow-arrow">
+            <span nz-icon nzType="arrow-right"></span>
+            <nz-tag nzColor="blue">{{ mappingTypeKey(m.mappingType) | translate }}</nz-tag>
+          </div>
+          <div class="mapping-unit new">
+            <div class="mapping-unit-label">{{ 'mdm.adminUnitMapping.newUnit' | translate }}</div>
+            <div class="mapping-unit-code">{{ m.newUnitCode }}</div>
+            <div class="mapping-unit-name">{{ m.newUnitName }}</div>
+          </div>
+        </div>
+
+        <nz-descriptions nzBordered [nzColumn]="1" nzSize="small">
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnitMapping.effectiveDate' | translate">
+            {{ m.effectiveDate | date: 'dd/MM/yyyy' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnitMapping.countryCode' | translate">
+            {{ m.countryCode }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnitMapping.legalReference' | translate">
+            {{ m.legalReference || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.adminUnitMapping.note' | translate">
+            <span class="pre-line">{{ m.note || '-' }}</span>
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.createdAt' | translate">
+            {{ m.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.updatedAt' | translate">
+            {{ m.updatedAt ? (m.updatedAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+          </nz-descriptions-item>
+        </nz-descriptions>
+      } @else if (!loading) {
+        <nz-empty></nz-empty>
+      }
+    </nz-spin>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" (click)="close()">
+      {{ 'common.actions.close' | translate }}
+    </button>
+    @if (canEdit && mapping) {
+      <button nz-button nzType="primary" type="button" (click)="onEdit()">
+        <span nz-icon nzType="edit"></span>
+        {{ 'table.action.edit' | translate }}
+      </button>
+    }
+  </div>
+</ng-template>

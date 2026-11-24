@@ -1,0 +1,31 @@
+.rate-hero {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  background: var(--muted, rgba(0, 0, 0, 0.03));
+  font-variant-numeric: tabular-nums;
+
+  &-main {
+    font-size: 20px;
+
+    strong {
+      font-size: 24px;
+    }
+  }
+
+  &-sub {
+    margin-top: 4px;
+    color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+  }
+
+  &-tags {
+    margin-top: 8px;
+  }
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

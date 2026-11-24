@@ -1,0 +1,63 @@
+<app-filter-custom
+  [id]="'exchange-rate-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'exchange-rate-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'130px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Cặp tiền: USD → VND -->
+<ng-template #pairTpl let-row>
+  <span class="rate-pair">
+    <strong>{{ row.fromCurrency }}</strong>
+    <span nz-icon nzType="arrow-right"></span>
+    <strong>{{ row.toCurrency }}</strong>
+  </span>
+</ng-template>
+
+<!-- Tỷ giá: 1 USD = 25.400 VND -->
+<ng-template #rateTpl let-row>
+  <span class="rate-value">{{ row.rate | number: '1.0-8' }}</span>
+</ng-template>
+
+<!-- Phạm vi: dùng chung / riêng tenant -->
+<ng-template #scopeTpl let-row>
+  @if (row.isShared) {
+    <nz-tag nzColor="blue">{{ 'mdm.exchangeRate.shared' | translate }}</nz-tag>
+  } @else {
+    <nz-tag nzColor="purple">{{ 'mdm.exchangeRate.tenantOwn' | translate }}</nz-tag>
+  }
+</ng-template>
+
+<app-exchange-rate-detail
+  [(visible)]="detailVisible"
+  [rateId]="detailId"
+  [canEdit]="canUpdate"
+  [canEditRow]="canEditRow.bind(this)"
+  (edit)="openEdit($event)"
+></app-exchange-rate-detail>
+
+<app-add-or-update-exchange-rate
+  [(visible)]="formVisible"
+  [rate]="editing"
+  (saved)="onSaved()"
+></app-add-or-update-exchange-rate>

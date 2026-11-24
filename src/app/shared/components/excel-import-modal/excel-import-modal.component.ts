@@ -11,6 +11,7 @@ import {
   OnInit,
   Optional,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import * as XLSX from 'xlsx';
@@ -68,7 +69,12 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
     private i18n: I18nMessageService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private translate: TranslateService,
   ) {}
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translate.instant(key, params);
+  }
 
   get paginationConfig(): PaginationConfig {
     return {
@@ -89,7 +95,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
         this.parseExcelFile(this.file);
       }, 0);
     } else {
-      this.parseError = 'Không tìm thấy file Excel.';
+      this.parseError = this.t('common.import.fileNotFound');
       this.parsing = false;
       this.cdr.detectChanges();
     }
@@ -123,7 +129,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
           this.sheetNames = workbook.SheetNames || [];
 
           if (this.sheetNames.length === 0) {
-            this.parseError = 'File Excel không có trang tính (Sheet) nào.';
+            this.parseError = this.t('common.import.noSheet');
             this.parsing = false;
             this.cdr.detectChanges();
             return;
@@ -134,7 +140,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
           this.parsing = false;
         } catch (err: any) {
           console.error('Error parsing Excel file:', err);
-          this.parseError = 'Không thể đọc nội dung file Excel: ' + (err?.message || err);
+          this.parseError = this.t('common.import.readFailed', { error: err?.message || err });
           this.parsing = false;
         } finally {
           this.cdr.detectChanges();
@@ -145,7 +151,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
     reader.onerror = (err) => {
       this.ngZone.run(() => {
         console.error('FileReader error:', err);
-        this.parseError = 'Đã xảy ra lỗi khi đọc file.';
+        this.parseError = this.t('common.import.readFileError');
         this.parsing = false;
         this.cdr.detectChanges();
       });
@@ -200,7 +206,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
     this.headers = (jsonData[0] || []).map((h: any, idx: number) =>
       h !== undefined && h !== null && String(h).trim() !== ''
         ? String(h).trim()
-        : `Cột ${idx + 1}`,
+        : this.t('common.import.column', { index: idx + 1 }),
     );
 
     const dataRows = jsonData
@@ -258,13 +264,13 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
 
   confirmImport(): void {
     if (this.totalRows === 0) {
-      this.message.warning('File Excel không có dòng dữ liệu nào để nhập.');
+      this.message.warning(this.t('common.import.noRows'));
       return;
     }
 
     this.importing = true;
     this.progressPercent = 10;
-    this.progressStatusMessage = 'Đang tải file lên máy chủ...';
+    this.progressStatusMessage = this.t('common.import.uploading');
     this.cdr.detectChanges();
 
     this.startProgressAnimation();
@@ -299,7 +305,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
         },
       });
     } else {
-      this.handleImportError('Không tìm thấy đường dẫn API nhập file.');
+      this.handleImportError(this.t('common.import.noImportUrl'));
     }
   }
 
@@ -311,9 +317,9 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
           const step = Math.max(1, Math.floor((90 - this.progressPercent) / 5));
           this.progressPercent += step;
           if (this.progressPercent > 25 && this.progressPercent <= 65) {
-            this.progressStatusMessage = 'Máy chủ đang phân tích và lưu trữ dữ liệu...';
+            this.progressStatusMessage = this.t('common.import.processing');
           } else if (this.progressPercent > 65) {
-            this.progressStatusMessage = 'Đang hoàn tất xử lý...';
+            this.progressStatusMessage = this.t('common.import.finishing');
           }
           this.cdr.detectChanges();
         }
@@ -331,16 +337,16 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
   private handleImportSuccess(res: ImportResult): void {
     this.stopProgressAnimation();
     this.progressPercent = 100;
-    this.progressStatusMessage = 'Hoàn tất nhập dữ liệu!';
+    this.progressStatusMessage = this.t('common.import.completed');
     this.importing = false;
     this.importCompleted = true;
     this.importResult = res;
 
     if (res.errorCount === 0) {
-      this.message.success(`Nhập thành công toàn bộ ${res.successCount} dòng dữ liệu!`);
+      this.message.success(this.t('common.import.allSuccess', { count: res.successCount }));
     } else {
       this.message.warning(
-        `Đã nhập ${res.successCount}/${res.totalRows} dòng thành công, ${res.errorCount} dòng gặp lỗi.`,
+        this.i18n.excelImportPartial(res.successCount, res.totalRows, res.errorCount),
       );
     }
 
@@ -358,12 +364,12 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
     const errMsg =
       typeof err === 'string'
         ? err
-        : err?.error?.message || err?.error || err?.message || 'Lỗi không xác định khi nhập file.';
+        : err?.error?.message || err?.error || err?.message || this.t('common.import.unknownError');
     this.importResult = {
       totalRows: this.totalRows,
       successCount: 0,
       errorCount: this.totalRows,
-      errors: [`Lỗi hệ thống: ${errMsg}`],
+      errors: [this.t('common.import.systemError', { error: errMsg })],
     };
     this.message.error(errMsg);
     this.cdr.detectChanges();
@@ -373,7 +379,7 @@ export class ExcelImportModalComponent implements OnInit, OnDestroy {
     if (!this.importResult?.errors?.length) return;
     const errorText = this.importResult.errors.join('\n');
     navigator.clipboard.writeText(errorText).then(() => {
-      this.message.success('Đã sao chép danh sách lỗi vào clipboard!');
+      this.message.success(this.t('common.import.errorsCopied'));
     });
   }
 

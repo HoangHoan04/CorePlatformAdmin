@@ -9,7 +9,8 @@ export interface TabItem {
 }
 
 export interface DashboardSettings {
-  language: 'vi' | 'en';
+  /** Mã ngôn ngữ (config.languages.code, VD: vi-VN, en-US; mã cũ vi / en vẫn dùng được) */
+  language: string;
   dynamicTitle: boolean;
   backToTop: boolean;
   watermark: boolean;
@@ -163,6 +164,10 @@ export class DashboardService {
 
   constructor(private translate: TranslateService) {
     this.applyTheme(this.snapshot);
+    // Áp dụng ngôn ngữ đã lưu (mã đầy đủ vi-VN / en-US... hoặc mã cũ vi / en)
+    if (this.snapshot.language && this.snapshot.language !== this.translate.getCurrentLang()) {
+      this.translate.use(this.snapshot.language);
+    }
   }
 
   updateSettings(partial: Partial<DashboardSettings>): void {
@@ -176,6 +181,9 @@ export class DashboardService {
   }
 
   resetSettings(): void {
+    if (this.translate.getCurrentLang() !== DEFAULT_SETTINGS.language) {
+      this.translate.use(DEFAULT_SETTINGS.language);
+    }
     this.settingsSubject.next({ ...DEFAULT_SETTINGS });
     saveSettings({ ...DEFAULT_SETTINGS });
     this.applyTheme(DEFAULT_SETTINGS);

@@ -1,0 +1,190 @@
+<app-filter-custom
+  [id]="'language-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'language-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'210px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Tên ngôn ngữ + tên bản ngữ -->
+<ng-template #nameTpl let-row>
+  <div class="lang-name">
+    <span class="lang-name-main">{{ row.name }}</span>
+    <span class="lang-name-native" [attr.dir]="row.direction === 'RTL' ? 'rtl' : null">
+      {{ row.nativeName }}
+    </span>
+  </div>
+</ng-template>
+
+<!-- Tiến độ dịch -->
+<ng-template #progressTpl let-row>
+  <div class="lang-progress">
+    <nz-progress
+      [nzPercent]="percent(row)"
+      nzSize="small"
+      [nzStatus]="percent(row) >= 100 ? 'success' : 'active'"
+      [nzShowInfo]="false"
+    ></nz-progress>
+    <span class="lang-progress-text">
+      {{ row.translatedCount }}/{{ row.totalKeys }} · {{ percent(row) }}%
+    </span>
+  </div>
+</ng-template>
+
+<!-- Ngôn ngữ mặc định -->
+<ng-template #defaultTpl let-row>
+  @if (row.isDefault) {
+    <nz-tag nzColor="gold">
+      <span nz-icon nzType="star" nzTheme="fill"></span>
+      {{ 'i18n.language.default' | translate }}
+    </nz-tag>
+  } @else {
+    <span class="text-muted">-</span>
+  }
+</ng-template>
+
+<!-- Form tạo / sửa ngôn ngữ -->
+<nz-modal
+  [nzVisible]="modalVisible"
+  [nzTitle]="(editing ? 'i18n.language.editTitle' : 'i18n.language.createTitle') | translate"
+  [nzWidth]="640"
+  [nzMaskClosable]="false"
+  [nzOkText]="'common.actions.save' | translate"
+  [nzCancelText]="'common.actions.cancel' | translate"
+  [nzOkLoading]="saving"
+  (nzOnOk)="submit()"
+  (nzOnCancel)="closeModal()"
+>
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical" class="lang-form">
+      @if (!editing) {
+        <nz-form-item>
+          <nz-form-label>{{ 'i18n.language.preset' | translate }}</nz-form-label>
+          <nz-form-control>
+            <nz-select
+              formControlName="preset"
+              nzShowSearch
+              nzAllowClear
+              [nzPlaceHolder]="'i18n.language.presetPlaceholder' | translate"
+            >
+              @for (p of presets; track p.code) {
+                <nz-option [nzValue]="p.code" [nzLabel]="p.code + ' — ' + p.name + ' (' + p.nativeName + ')'"></nz-option>
+              }
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      }
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'i18n.language.code' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'i18n.language.codeInvalid' | translate">
+              <input nz-input formControlName="code" placeholder="vi-VN" maxlength="10" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'i18n.language.name' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'i18n.language.nameRequired' | translate">
+              <input nz-input formControlName="name" maxlength="100" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'i18n.language.nativeName' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'i18n.language.nativeNameRequired' | translate">
+              <input nz-input formControlName="nativeName" maxlength="100" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'i18n.language.direction' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-radio-group formControlName="direction" nzButtonStyle="solid">
+                <label nz-radio-button nzValue="LTR">LTR</label>
+                <label nz-radio-button nzValue="RTL">RTL</label>
+              </nz-radio-group>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'i18n.language.dateFormat' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="dateFormat">
+                @for (f of dateFormats; track f) {
+                  <nz-option [nzValue]="f" [nzLabel]="f"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'i18n.language.sortOrder' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-input-number formControlName="sortOrder" [nzMin]="0" [nzStep]="1" class="w-full"></nz-input-number>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'i18n.language.decimalSeparator' | translate }}</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="decimal" maxlength="3" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'i18n.language.groupSeparator' | translate }}</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="group" maxlength="3" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="8">
+          <nz-form-item>
+            <nz-form-label>{{ 'i18n.language.isActive' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="isActive" [nzDisabled]="!!editing?.isDefault"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      @if (editing?.isDefault) {
+        <nz-alert nzType="info" nzShowIcon [nzMessage]="'i18n.language.defaultHint' | translate"></nz-alert>
+      }
+    </form>
+  </ng-container>
+</nz-modal>

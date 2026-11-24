@@ -8,8 +8,8 @@
     <div class="sidebar-logo">
       <img
         class="sidebar-logo-img"
-        src="assets/icons/smarthrm-32.png"
-        alt="SMARTHRM"
+        src="assets/icons/logo.svg"
+        alt="BASE ERP"
         width="28"
         height="28"
       />
@@ -18,7 +18,7 @@
           class="sidebar-brand"
           style="font-weight: 800; font-size: 16px; color: var(--primary)"
         >
-          SMARTHRM
+          BASE ERP
         </span>
       </div>
     </div>
@@ -29,7 +29,7 @@
       @if (item.children && item.children.length > 0) {
         <li
           nz-submenu
-          [nzTitle]="item.translationKey | translate"
+          [nzTitle]="item | routeLabel"
           [nzIcon]="item.icon || null"
           nzMatchRouter
         >
@@ -38,7 +38,7 @@
               @if (child.children && child.children.length > 0) {
                 <li
                   nz-submenu
-                  [nzTitle]="child.translationKey | translate"
+                  [nzTitle]="child | routeLabel"
                   [nzIcon]="child.icon || null"
                   nzMatchRouter
                 >
@@ -54,7 +54,7 @@
                           <span nz-icon [nzType]="grand.icon" nzTheme="outline"></span>
                         }
                         @if (!collapsed) {
-                          <span>{{ grand.translationKey | translate }}</span>
+                          <span>{{ grand | routeLabel }}</span>
                         }
                       </li>
                     }
@@ -71,7 +71,7 @@
                     <span nz-icon [nzType]="child.icon" nzTheme="outline"></span>
                   }
                   @if (!collapsed) {
-                    <span>{{ child.translationKey | translate }}</span>
+                    <span>{{ child | routeLabel }}</span>
                   }
                 </li>
               }
@@ -87,7 +87,7 @@
         >
           <span nz-icon [nzType]="item.icon || 'dashboard'" nzTheme="outline"></span>
           @if (!collapsed) {
-            <span>{{ item.translationKey | translate }}</span>
+            <span>{{ item | routeLabel }}</span>
           }
         </li>
       }

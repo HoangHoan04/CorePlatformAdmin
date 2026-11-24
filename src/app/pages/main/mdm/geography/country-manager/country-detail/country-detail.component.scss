@@ -1,0 +1,30 @@
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detail-flag {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.detail-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detail-sub {
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+}
+
+.detail-status {
+  margin-left: auto;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

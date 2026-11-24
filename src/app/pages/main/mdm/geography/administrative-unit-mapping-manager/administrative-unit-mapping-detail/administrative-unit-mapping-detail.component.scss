@@ -1,0 +1,50 @@
+.mapping-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mapping-unit {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+
+  &.old {
+    background: var(--muted, rgba(0, 0, 0, 0.03));
+  }
+
+  &-label {
+    font-size: 12px;
+    color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+  }
+
+  &-code {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &-name {
+    font-size: 13px;
+  }
+}
+
+.mapping-flow-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 18px;
+}
+
+.pre-line {
+  white-space: pre-line;
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

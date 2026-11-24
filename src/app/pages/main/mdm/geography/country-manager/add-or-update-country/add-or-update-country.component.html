@@ -1,0 +1,129 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="720"
+  [nzTitle]="(isEdit ? 'mdm.country.editTitle' : 'mdm.country.createTitle') | translate"
+  [nzMaskClosable]="false"
+  [nzClosable]="!saving"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.country.code' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.codeInvalid' | translate">
+              <input nz-input formControlName="code" maxlength="2" class="uppercase" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.country.alpha3Code' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.alpha3CodeInvalid' | translate">
+              <input nz-input formControlName="alpha3Code" maxlength="3" class="uppercase" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.numericCode' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.numericCodeInvalid' | translate">
+              <input nz-input formControlName="numericCode" maxlength="3" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.country.name' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.nameRequired' | translate">
+              <input nz-input formControlName="name" maxlength="150" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.country.nameEn' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.nameEnRequired' | translate">
+              <input nz-input formControlName="nameEn" maxlength="150" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.phoneCode' | translate }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.country.phoneCodeInvalid' | translate">
+              <input nz-input formControlName="phoneCode" maxlength="10" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.currencyCode' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="currencyCode" nzShowSearch nzAllowClear>
+                @for (c of currencies; track c.id) {
+                  <nz-option [nzValue]="c.code" [nzLabel]="c.code + ' — ' + c.name"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.flagEmoji' | translate }}</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="flagEmoji" maxlength="10" />
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.sortOrder' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-input-number
+                formControlName="sortOrder"
+                [nzMin]="0"
+                [nzStep]="1"
+                class="w-full"
+              ></nz-input-number>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label>{{ 'mdm.country.isActive' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="isActive"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <button type="submit" hidden></button>
+    </form>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" [disabled]="saving" (click)="close()">
+      {{ 'common.actions.cancel' | translate }}
+    </button>
+    <button nz-button nzType="primary" type="button" [nzLoading]="saving" (click)="submit()">
+      <span nz-icon nzType="save"></span>
+      {{ 'common.actions.save' | translate }}
+    </button>
+  </div>
+</ng-template>

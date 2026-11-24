@@ -1,0 +1,196 @@
+<div class="home">
+  <!-- Tiêu đề -->
+  <header class="home-header">
+    <div>
+      <h1 class="home-title">{{ greetingKey | translate }}, {{ displayName }} 👋</h1>
+      <p class="home-subtitle">
+        @if (user?.isPlatformAdmin) {
+          {{ 'home.subtitlePlatform' | translate }}
+        } @else {
+          {{ 'home.subtitleTenant' | translate: { tenant: user?.tenantName || '' } }}
+        }
+      </p>
+    </div>
+    <div class="home-actions">
+      <nz-radio-group [ngModel]="days" (ngModelChange)="onDaysChange($event)" nzButtonStyle="solid">
+        @for (d of dayOptions; track d) {
+          <label nz-radio-button [nzValue]="d">{{ 'home.lastDays' | translate: { days: d } }}</label>
+        }
+      </nz-radio-group>
+      <button nz-button (click)="load()" [nzLoading]="loading" [attr.aria-label]="'home.refresh' | translate">
+        @if (!loading) {
+          <span nz-icon nzType="reload"></span>
+        }
+        {{ 'home.refresh' | translate }}
+      </button>
+    </div>
+  </header>
+
+  @if (error) {
+    <nz-alert nzType="error" nzShowIcon [nzMessage]="error" [nzAction]="retryTpl" class="home-error"></nz-alert>
+    <ng-template #retryTpl>
+      <button nz-button nzSize="small" nzType="primary" nzDanger (click)="load()">
+        {{ 'home.retry' | translate }}
+      </button>
+    </ng-template>
+  }
+
+  <nz-spin [nzSpinning]="loading && !data">
+    @if (data) {
+      <!-- Chỉ số chính -->
+      <section class="stat-grid">
+        @for (card of statCards; track card.key) {
+          <div class="stat-card" [attr.data-tone]="card.tone">
+            <div class="stat-icon"><span nz-icon [nzType]="card.icon" nzTheme="outline"></span></div>
+            <div class="stat-body">
+              <span class="stat-label">{{ card.key | translate }}</span>
+              <span class="stat-value">{{ card.value | number }}</span>
+              <span class="stat-hint">{{ card.hint }}</span>
+            </div>
+          </div>
+        }
+      </section>
+
+      <section class="org-strip">
+        @for (item of orgCards; track item.key) {
+          <div class="org-item">
+            <span nz-icon [nzType]="item.icon" nzTheme="outline"></span>
+            <span class="org-label">{{ item.key | translate }}</span>
+            <strong class="org-value">{{ item.value | number }}</strong>
+          </div>
+        }
+      </section>
+
+      <section class="main-grid">
+        <!-- Biểu đồ đăng nhập -->
+        <nz-card class="panel chart-panel" [nzTitle]="chartTitle" [nzBordered]="false">
+          <ng-template #chartTitle>
+            <div class="panel-title">
+              <span>{{ 'home.chart.title' | translate }}</span>
+              <span class="panel-meta">
+                <span class="dot dot-success"></span>{{ totalLogins.success }}
+                <span class="dot dot-danger"></span>{{ totalLogins.failed }}
+              </span>
+            </div>
+          </ng-template>
+          @if (chartOption) {
+            <div echarts [options]="chartOption" [autoResize]="true" class="chart"></div>
+          }
+          @if (totalLogins.success + totalLogins.failed === 0) {
+            <p class="chart-empty">{{ 'home.chart.empty' | translate }}</p>
+          }
+        </nz-card>
+
+        <!-- Tình trạng hệ thống -->
+        <nz-card class="panel" [nzTitle]="'home.system.title' | translate" [nzBordered]="false">
+          <ul class="health-list">
+            <li>
+              <span class="health-label">{{ 'home.system.database' | translate }}</span>
+              <span class="health-value">
+                <nz-tag [nzColor]="data.system.canConnect ? 'success' : 'error'">
+                  {{ (data.system.canConnect ? 'home.system.connected' : 'home.system.disconnected') | translate }}
+                </nz-tag>
+                <code>{{ data.system.database }}</code>
+              </span>
+            </li>
+            <li>
+              <span class="health-label">{{ 'home.system.server' | translate }}</span>
+              <span class="health-value">{{ data.system.serverVersion }}</span>
+            </li>
+            <li>
+              <span class="health-label">{{ 'home.system.migrations' | translate }}</span>
+              <span class="health-value">
+                <nz-tag [nzColor]="data.system.pendingMigrations ? 'warning' : 'success'">
+                  {{ 'home.system.migrationStatus' | translate: { applied: data.system.appliedMigrations, pending: data.system.pendingMigrations } }}
+                </nz-tag>
+              </span>
+            </li>
+            @if (data.system.lastMigration; as last) {
+              <li>
+                <span class="health-label">{{ 'home.system.lastMigration' | translate }}</span>
+                <span class="health-value"><code>{{ last }}</code></span>
+              </li>
+            }
+            <li>
+              <span class="health-label">pgvector (AI / RAG)</span>
+              <span class="health-value">
+                <nz-tag
+                  [nzColor]="data.system.pgvectorEnabled ? 'success' : 'warning'"
+                  nz-tooltip
+                  [nzTooltipTitle]="data.system.pgvectorEnabled ? null : ('home.system.pgvectorHint' | translate)"
+                >
+                  {{ (data.system.pgvectorEnabled ? 'home.system.enabled' : 'home.system.notInstalled') | translate }}
+                </nz-tag>
+              </span>
+            </li>
+            <li>
+              <span class="health-label">{{ 'home.system.updatedAt' | translate }}</span>
+              <span class="health-value">{{ data.generatedAt | date: 'HH:mm:ss dd/MM/yyyy' }}</span>
+            </li>
+          </ul>
+        </nz-card>
+      </section>
+
+      <section class="main-grid">
+        <!-- Đăng nhập gần đây -->
+        <nz-card class="panel" [nzTitle]="'home.recent.title' | translate" [nzBordered]="false">
+          <nz-table
+            #recentTable
+            [nzData]="data.recentLogins"
+            [nzShowPagination]="false"
+            nzSize="small"
+            [nzNoResult]="'home.recent.empty' | translate"
+            [nzScroll]="{ x: '560px' }"
+          >
+            <thead>
+              <tr>
+                <th nzWidth="140px">{{ 'home.recent.time' | translate }}</th>
+                <th>{{ 'home.recent.user' | translate }}</th>
+                <th>{{ 'home.recent.event' | translate }}</th>
+                <th>{{ 'home.recent.ip' | translate }}</th>
+                <th>{{ 'home.recent.client' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (log of recentTable.data; track $index) {
+                <tr>
+                  <td class="nowrap">{{ log.occurredAt | date: 'HH:mm:ss dd/MM' }}</td>
+                  <td class="nowrap">{{ log.username || '—' }}</td>
+                  <td>
+                    <nz-tag
+                      [nzColor]="eventColor(log.eventType)"
+                      nz-tooltip
+                      [nzTooltipTitle]="log.failureReason"
+                    >
+                      {{ eventLabel(log.eventType) }}
+                    </nz-tag>
+                  </td>
+                  <td class="nowrap"><code>{{ log.ipAddress || '—' }}</code></td>
+                  <td class="nowrap muted">{{ describeAgent(log) }}</td>
+                </tr>
+              }
+            </tbody>
+          </nz-table>
+        </nz-card>
+
+        <!-- Phân hệ -->
+        <nz-card class="panel" [nzTitle]="'home.modules.title' | translate" [nzBordered]="false">
+          <ul class="module-list">
+            @for (m of data.modules; track m.code) {
+              <li class="module-item" [class.inactive]="!m.isActive">
+                <span class="module-code">{{ m.code }}</span>
+                <span class="module-name">{{ m.name }}</span>
+                @if (m.isCore) {
+                  <nz-tag nzColor="geekblue">{{ 'home.modules.core' | translate }}</nz-tag>
+                }
+                <nz-tag [nzColor]="m.isActive ? 'success' : 'default'">
+                  {{ (m.isActive ? 'home.modules.active' : 'home.modules.inactive') | translate }}
+                </nz-tag>
+              </li>
+            }
+          </ul>
+        </nz-card>
+      </section>
+    }
+  </nz-spin>
+</div>

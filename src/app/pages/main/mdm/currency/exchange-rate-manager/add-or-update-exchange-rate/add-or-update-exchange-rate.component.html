@@ -1,0 +1,148 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="620"
+  [nzTitle]="(isEdit ? 'mdm.exchangeRate.editTitle' : 'mdm.exchangeRate.createTitle') | translate"
+  [nzMaskClosable]="false"
+  [nzClosable]="!saving"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+      <!-- 1 [tiền nguồn] = [tỷ giá] [tiền đích] -->
+      <div class="rate-box">
+        <div nz-row [nzGutter]="12" nzAlign="bottom">
+          <div nz-col [nzSpan]="10">
+            <nz-form-item>
+              <nz-form-label nzRequired>{{
+                'mdm.exchangeRate.fromCurrency' | translate
+              }}</nz-form-label>
+              <nz-form-control>
+                <nz-select formControlName="fromCurrency" nzShowSearch>
+                  @for (c of currencies; track c.id) {
+                    <nz-option [nzValue]="c.code" [nzLabel]="c.code + ' — ' + c.name"></nz-option>
+                  }
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div nz-col [nzSpan]="4" class="swap-col">
+            <button
+              nz-button
+              type="button"
+              nz-tooltip
+              [nzTooltipTitle]="'mdm.exchangeRate.swap' | translate"
+              (click)="swap()"
+            >
+              <span nz-icon nzType="swap"></span>
+            </button>
+          </div>
+          <div nz-col [nzSpan]="10">
+            <nz-form-item>
+              <nz-form-label nzRequired>{{
+                'mdm.exchangeRate.toCurrency' | translate
+              }}</nz-form-label>
+              <nz-form-control>
+                <nz-select formControlName="toCurrency" nzShowSearch>
+                  @for (c of currencies; track c.id) {
+                    <nz-option [nzValue]="c.code" [nzLabel]="c.code + ' — ' + c.name"></nz-option>
+                  }
+                </nz-select>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>{{ 'mdm.exchangeRate.rate' | translate }}</nz-form-label>
+          <nz-form-control [nzErrorTip]="'mdm.exchangeRate.rateInvalid' | translate">
+            <div class="rate-input-row">
+              <span class="rate-addon">1 {{ form.value.fromCurrency || '' }} =</span>
+              <nz-input-number
+                formControlName="rate"
+                [nzMin]="0.00000001"
+                [nzStep]="1"
+                [nzPrecision]="8"
+                class="rate-input-number"
+              ></nz-input-number>
+              <span class="rate-addon">{{ form.value.toCurrency || '' }}</span>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        @if (inverse) {
+          <div class="rate-inverse">
+            1 {{ form.value.toCurrency }} = {{ inverse | number: '1.0-8' }}
+            {{ form.value.fromCurrency }}
+          </div>
+        }
+      </div>
+
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{ 'mdm.exchangeRate.rateType' | translate }}</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="rateType">
+                @for (t of rateTypes; track t) {
+                  <nz-option [nzValue]="t" [nzLabel]="rateTypeKey(t) | translate"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>{{
+              'mdm.exchangeRate.effectiveAt' | translate
+            }}</nz-form-label>
+            <nz-form-control [nzErrorTip]="'mdm.exchangeRate.effectiveAtRequired' | translate">
+              <nz-date-picker
+                formControlName="effectiveAt"
+                nzShowTime
+                nzFormat="dd/MM/yyyy HH:mm"
+                class="w-full"
+              ></nz-date-picker>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label>{{ 'mdm.exchangeRate.source' | translate }}</nz-form-label>
+        <nz-form-control [nzExtra]="'mdm.exchangeRate.sourceHint' | translate">
+          <nz-select formControlName="source" nzShowSearch>
+            @for (b of banks; track b.id) {
+              <nz-option [nzValue]="b.code" [nzLabel]="b.name"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>{{ 'mdm.exchangeRate.note' | translate }}</nz-form-label>
+        <nz-form-control>
+          <textarea
+            nz-input
+            formControlName="note"
+            maxlength="255"
+            [nzAutosize]="{ minRows: 2, maxRows: 4 }"
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <button type="submit" hidden></button>
+    </form>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" [disabled]="saving" (click)="close()">
+      {{ 'common.actions.cancel' | translate }}
+    </button>
+    <button nz-button nzType="primary" type="button" [nzLoading]="saving" (click)="submit()">
+      <span nz-icon nzType="save"></span>
+      {{ 'common.actions.save' | translate }}
+    </button>
+  </div>
+</ng-template>

@@ -1,0 +1,244 @@
+nz-card {
+  border-radius: 8px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+nz-form-item {
+  margin-bottom: 16px;
+}
+
+$muted: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+$primary: var(--primary, #3b82f6);
+
+// ── Thống kê ──────────────────────────────────────────────────────────
+.i18n-stats {
+  margin-bottom: 16px;
+}
+
+.i18n-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  align-items: flex-end;
+}
+
+.i18n-stat-total {
+  display: flex;
+  flex-direction: column;
+  min-width: 110px;
+}
+
+.i18n-stat-label {
+  font-size: 12px;
+  color: $muted;
+}
+
+.i18n-stat-value {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.i18n-stat-lang {
+  flex: 1 1 220px;
+  max-width: 340px;
+
+  &.inactive {
+    opacity: 0.55;
+  }
+
+  &-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  &-name {
+    font-weight: 500;
+  }
+}
+
+.i18n-stat-code {
+  font-size: 11px;
+  font-weight: 400;
+  color: $muted;
+}
+
+.i18n-stat-count {
+  font-size: 12px;
+  color: $muted;
+  font-variant-numeric: tabular-nums;
+}
+
+.i18n-star {
+  color: #faad14;
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.i18n-empty-hint {
+  margin-top: 12px;
+}
+
+.dirty-tag {
+  margin-right: 8px;
+}
+
+// ── Cột khóa ─────────────────────────────────────────────────────────
+.key-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.key-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.key-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: none;
+  padding: 0;
+}
+
+.key-copy,
+.value-copy {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: $muted;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 12px;
+  line-height: 1;
+
+  &:hover {
+    color: $primary;
+  }
+}
+
+.key-desc {
+  font-size: 11px;
+  color: $muted;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.key-tags {
+  display: flex;
+  gap: 4px;
+}
+
+.key-platform {
+  font-size: 10px;
+  line-height: 14px;
+  padding: 0 4px;
+  border-radius: 3px;
+  color: $muted;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+}
+
+// ── Ô bản dịch ───────────────────────────────────────────────────────
+.value-cell {
+  position: relative;
+
+  textarea {
+    font-size: 13px;
+    resize: none;
+    padding-right: 22px;
+  }
+
+  &.missing textarea {
+    background: rgba(250, 173, 20, 0.06);
+    border-style: dashed;
+  }
+
+  &.dirty textarea {
+    border-color: #fa8c16;
+    box-shadow: 0 0 0 1px rgba(250, 140, 22, 0.25);
+  }
+}
+
+.value-flags {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.flag-unreviewed {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #faad14;
+}
+
+// ── Modal ────────────────────────────────────────────────────────────
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.key-value-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.key-value-label {
+  padding-top: 5px;
+  font-weight: 500;
+}
+
+.import-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  label[nz-checkbox] {
+    margin-left: 0;
+  }
+}
+
+.import-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.import-label {
+  font-weight: 500;
+}
+
+.import-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.import-file-name {
+  font-size: 12px;
+  color: $muted;
+}
+
+.w-full {
+  width: 100%;
+}

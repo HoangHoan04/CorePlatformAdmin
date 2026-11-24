@@ -87,6 +87,22 @@ app-change-language {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+.lang-code {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary, #3b82f6);
+  background: rgba(59, 130, 246, 0.12);
+}
+
 .lang-text {
   font-size: 14px;
   font-weight: 500;

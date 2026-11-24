@@ -141,9 +141,11 @@ export class TableCustomComponent implements OnInit, OnChanges, OnDestroy {
             this.message.error(this.i18n.excelTemplateFailed());
             return;
           }
+          // Tên file lấy từ header Content-Disposition của API (CORS phải expose header này);
+          // tên dự phòng chỉ dùng khi không đọc được header.
           const fileName = extractFileName(
             response.headers.get('content-disposition'),
-            'Mau_Import.xlsx',
+            parent?.fallbackFileName || `Template_${new Date().getTime()}.xlsx`,
           );
           downloadBlob(blob, fileName);
           this.message.success(this.i18n.excelTemplateSuccess());

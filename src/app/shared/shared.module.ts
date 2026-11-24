@@ -45,6 +45,7 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { ExcelImportModalComponent } from './components/excel-import-modal/excel-import-modal.component';
 import { FilterCustomComponent } from './components/filter-custom/filter-custom.component';
 import { TableCustomComponent } from './components/table-custom/table-custom.component';
+import { RouteLabelPipe } from './pipes/route-label.pipe';
 import {
   SelectSearchDefaultDirective,
   SelectVietnameseFilterDirective,
@@ -52,6 +53,7 @@ import {
 
 @NgModule({
   declarations: [
+    RouteLabelPipe,
     FilterCustomComponent,
     TableCustomComponent,
     ExcelImportModalComponent,
@@ -105,6 +107,7 @@ import {
     NzRadioModule,
   ],
   exports: [
+    RouteLabelPipe,
     FilterCustomComponent,
     TableCustomComponent,
     ExcelImportModalComponent,

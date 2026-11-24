@@ -1,0 +1,92 @@
+<app-filter-custom
+  [id]="'admin-unit-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<!-- Thanh đường dẫn khi đang xem đơn vị trực thuộc -->
+@if (trail.length) {
+  <div class="tree-trail">
+    <span nz-icon nzType="apartment"></span>
+    <nz-breadcrumb>
+      <nz-breadcrumb-item>
+        <a (click)="goToCrumb(-1)">{{ 'mdm.adminUnit.allUnits' | translate }}</a>
+      </nz-breadcrumb-item>
+      @for (crumb of trail; track crumb.id; let i = $index, last = $last) {
+        <nz-breadcrumb-item>
+          @if (last) {
+            <strong>{{ crumb.name }}</strong>
+          } @else {
+            <a (click)="goToCrumb(i)">{{ crumb.name }}</a>
+          }
+        </nz-breadcrumb-item>
+      }
+    </nz-breadcrumb>
+  </div>
+}
+
+<app-table-custom
+  [id]="'admin-unit-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'190px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Cột mã -->
+<ng-template #codeTpl let-row>
+  <strong>{{ row.code }}</strong>
+</ng-template>
+
+<!-- Cột tên: tên ngắn + tên đầy đủ, bấm để xem đơn vị trực thuộc -->
+<ng-template #nameTpl let-row>
+  <div class="unit-name">
+    @if (row.childCount > 0) {
+      <a class="unit-name-main" (click)="drillDown(row)">{{ row.name }}</a>
+    } @else {
+      <span class="unit-name-main">{{ row.name }}</span>
+    }
+    <span class="unit-name-full">{{ row.fullName }}</span>
+  </div>
+</ng-template>
+
+<!-- Cột hiệu lực -->
+<ng-template #effectiveTpl let-row>
+  @if (row.effectiveFrom || row.effectiveTo) {
+    <span [class.text-muted]="!!row.effectiveTo">
+      {{ row.effectiveFrom ? (row.effectiveFrom | date: 'dd/MM/yyyy') : '…' }}
+      →
+      {{ row.effectiveTo ? (row.effectiveTo | date: 'dd/MM/yyyy') : ('mdm.adminUnit.present' | translate) }}
+    </span>
+  } @else {
+    <span class="text-muted">-</span>
+  }
+</ng-template>
+
+<app-administrative-unit-detail
+  [(visible)]="detailVisible"
+  [unitId]="detailId"
+  [canEdit]="canUpdate"
+  (edit)="openEdit($event)"
+></app-administrative-unit-detail>
+
+<app-add-or-update-administrative-unit
+  [(visible)]="formVisible"
+  [unit]="editing"
+  [defaultParent]="currentParent"
+  [defaultCountryCode]="filters['countryCode']"
+  (saved)="onSaved()"
+></app-add-or-update-administrative-unit>

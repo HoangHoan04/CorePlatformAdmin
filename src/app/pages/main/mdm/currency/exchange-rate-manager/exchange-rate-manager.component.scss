@@ -1,0 +1,10 @@
+.rate-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rate-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}

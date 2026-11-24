@@ -1,0 +1,51 @@
+nz-form-item {
+  margin-bottom: 16px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.money-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--muted, rgba(0, 0, 0, 0.03));
+
+  &-label {
+    color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+  }
+
+  &-value {
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.symbol-position-group {
+  display: flex;
+  width: 100%;
+
+  > label[nz-radio-button] {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding-inline: 8px;
+  }
+}

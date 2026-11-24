@@ -1,0 +1,33 @@
+nz-form-item {
+  margin-bottom: 16px;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.logo-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  margin: -8px 0 16px;
+  border-radius: 6px;
+  border: 1px dashed var(--border, rgba(0, 0, 0, 0.12));
+
+  img {
+    max-height: 56px;
+    max-width: 200px;
+    object-fit: contain;
+  }
+}
+
+.text-muted {
+  color: var(--muted-foreground, rgba(0, 0, 0, 0.45));
+}
+
+.drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

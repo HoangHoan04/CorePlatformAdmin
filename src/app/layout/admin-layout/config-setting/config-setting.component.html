@@ -20,12 +20,13 @@
         <div class="config-row">
           <span class="config-label">{{ 'configSetting.language' | translate }}</span>
           <nz-select
-            [(ngModel)]="s.language"
+            [ngModel]="langSvc.find(s.language)?.code ?? s.language"
             (ngModelChange)="update({ language: $event })"
             style="width: 200px"
           >
-            <nz-option nzValue="vi" [nzLabel]="'table.languageVi' | translate"></nz-option>
-            <nz-option nzValue="en" [nzLabel]="'table.languageEn' | translate"></nz-option>
+            @for (lang of langSvc.languages$ | async; track lang.code) {
+              <nz-option [nzValue]="lang.code" [nzLabel]="lang.nativeName"></nz-option>
+            }
           </nz-select>
         </div>
 

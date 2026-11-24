@@ -1,4 +1,4 @@
-import { getRouteByPath } from '@/app/core/constants/common';
+import { getRouteByPath, resolveRouteLabel } from '@/app/core/constants/common';
 import { DashboardService, DashboardSettings, TabItem } from '@/app/core/services';
 import {
   AfterViewInit,
@@ -10,6 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription, filter } from 'rxjs';
 
 @Component({
@@ -35,6 +36,7 @@ export class TabsBarComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     public ds: DashboardService,
     private router: Router,
+    private translate: TranslateService,
   ) {
     this.s = ds.snapshot;
     this.openTabs = ds.openTabs;
@@ -284,6 +286,6 @@ export class TabsBarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getRouteLabel(tab: TabItem): string {
     const route = getRouteByPath(tab.path);
-    return route ? route.label : tab.translationKey || tab.id;
+    return route ? resolveRouteLabel(route, (k) => this.translate.instant(k)) : tab.translationKey || tab.id;
   }
 }

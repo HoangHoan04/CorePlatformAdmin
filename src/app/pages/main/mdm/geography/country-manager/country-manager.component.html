@@ -1,0 +1,52 @@
+<app-filter-custom
+  [id]="'country-filter'"
+  [fields]="filterFields"
+  [filters]="filters"
+  [config]="filterConfig"
+  [filterActions]="filterActions"
+  [loading]="loading"
+  (filtersChange)="onFiltersChange($event)"
+></app-filter-custom>
+
+<app-table-custom
+  [id]="'country-table'"
+  [data]="data"
+  [columns]="columns"
+  [loading]="loading"
+  [showIndexList]="true"
+  [stripedRows]="true"
+  [rowActions]="rowActions"
+  [rowActionsWidth]="'160px'"
+  [pagination]="pagination"
+  [toolbar]="toolbar"
+  [toolbarActions]="toolbarActions"
+  (pageChange)="onPageChange($event)"
+  (sortChange)="onSortChange($event)"
+  (refresh)="loadData()"
+></app-table-custom>
+
+<!-- Cột mã: cờ + mã alpha-2 -->
+<ng-template #codeTpl let-row>
+  <span class="country-code">
+    @if (row.flagEmoji) {
+      <span class="country-flag">{{ row.flagEmoji }}</span>
+    }
+    <strong>{{ row.code }}</strong>
+  </span>
+</ng-template>
+
+<!-- Sheet xem chi tiết -->
+<app-country-detail
+  [(visible)]="detailVisible"
+  [countryId]="detailId"
+  [canEdit]="canUpdate"
+  (edit)="openEdit($event)"
+></app-country-detail>
+
+<!-- Sheet thêm mới / chỉnh sửa -->
+<app-add-or-update-country
+  [(visible)]="formVisible"
+  [country]="editing"
+  [nextSortOrder]="nextSortOrder"
+  (saved)="onSaved()"
+></app-add-or-update-country>

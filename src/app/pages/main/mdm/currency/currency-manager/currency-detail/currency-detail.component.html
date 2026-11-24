@@ -1,0 +1,74 @@
+<nz-drawer
+  [nzVisible]="visible"
+  nzPlacement="right"
+  [nzWidth]="600"
+  [nzTitle]="'mdm.currency.detailTitle' | translate"
+  [nzFooter]="footerTpl"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <nz-spin [nzSpinning]="loading">
+      @if (currency; as c) {
+        <div class="detail-header">
+          <span class="detail-symbol">{{ c.symbol }}</span>
+          <div>
+            <div class="detail-name">{{ c.code }} — {{ c.name }}</div>
+            <div class="detail-sub">{{ preview }}</div>
+          </div>
+          <nz-tag [nzColor]="c.isActive ? 'success' : 'error'" class="detail-status">
+            {{ (c.isActive ? 'common.statusActive' : 'common.statusInactive') | translate }}
+          </nz-tag>
+        </div>
+
+        <nz-descriptions nzBordered [nzColumn]="2" nzSize="small">
+          <nz-descriptions-item [nzTitle]="'mdm.currency.code' | translate">
+            <strong>{{ c.code }}</strong>
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.numericCode' | translate">
+            {{ c.numericCode || '-' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.symbol' | translate">
+            {{ c.symbol }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.symbolPosition' | translate">
+            {{ positionKey(c.symbolPosition) | translate }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.decimalPlaces' | translate">
+            {{ c.decimalPlaces }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.roundingUnit' | translate">
+            {{ c.roundingUnit }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.sortOrder' | translate">
+            {{ c.sortOrder }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'mdm.currency.preview' | translate">
+            {{ preview }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.createdAt' | translate">
+            {{ c.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item [nzTitle]="'common.updatedAt' | translate">
+            {{ c.updatedAt ? (c.updatedAt | date: 'dd/MM/yyyy HH:mm') : '-' }}
+          </nz-descriptions-item>
+        </nz-descriptions>
+      } @else if (!loading) {
+        <nz-empty></nz-empty>
+      }
+    </nz-spin>
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footerTpl>
+  <div class="drawer-footer">
+    <button nz-button type="button" (click)="close()">
+      {{ 'common.actions.close' | translate }}
+    </button>
+    @if (canEdit && currency) {
+      <button nz-button nzType="primary" type="button" (click)="onEdit()">
+        <span nz-icon nzType="edit"></span>
+        {{ 'table.action.edit' | translate }}
+      </button>
+    }
+  </div>
+</ng-template>

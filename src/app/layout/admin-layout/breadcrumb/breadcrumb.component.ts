@@ -1,4 +1,4 @@
-import { getFirstNavigableRoute, getRouteByPath } from '@/app/core/constants/common';
+import { getFirstNavigableRoute, getRouteByPath, resolveRouteLabel } from '@/app/core/constants/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -59,7 +59,7 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
     const homeRoute = getRouteByPath('/');
     list.push({
       label: homeRoute
-        ? this.translate.instant(homeRoute.translationKey)
+        ? resolveRouteLabel(homeRoute, (k) => this.translate.instant(k))
         : this.translate.instant('routes.home'),
       url: '/',
       isLast: url === '/',
@@ -75,7 +75,7 @@ export class BreadcrumbComponent implements OnInit, OnDestroy {
 
       const route = getRouteByPath(currentUrl);
       if (route && route.isShow !== false) {
-        const label = this.translate.instant(route.translationKey);
+        const label = resolveRouteLabel(route, (k) => this.translate.instant(k));
         const navigableRoute = getFirstNavigableRoute(route);
         const targetUrl = navigableRoute ? navigableRoute.path : route.path;
 

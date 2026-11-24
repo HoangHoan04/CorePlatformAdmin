@@ -1,11 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+/**
+ * Quyền của người dùng đang đăng nhập (lấy từ /auth/login, /auth/me) — chỉ dùng để ẩn/hiện giao diện;
+ * API luôn tự kiểm tra lại quyền ([HasPermission]).
+ * Platform Admin có toàn quyền (khớp với PermissionAuthorizationHandler phía API).
+ */
 @Injectable({ providedIn: 'root' })
 export class PermissionService {
   private readonly KEY_ROLES = 'auth_roles';
   private readonly KEY_PERMISSIONS = 'auth_permissions';
   private readonly KEY_USER_TYPE = 'auth_user_type';
+  private readonly SUPER_ADMIN = 'SUPER_ADMIN';
 
   private readonly permissionsSubject = new BehaviorSubject<string[]>([]);
   private readonly rolesSubject = new BehaviorSubject<string[]>([]);
@@ -40,11 +46,11 @@ export class PermissionService {
   setAuthContext(options: {
     roles?: string[] | null;
     permissions?: string[] | null;
-    type?: string | null;
+    isSuperAdmin?: boolean;
   }): void {
     const roles = options.roles ?? [];
     const permissions = options.permissions ?? [];
-    const type = options.type ?? null;
+    const type = options.isSuperAdmin ? this.SUPER_ADMIN : null;
 
     sessionStorage.setItem(this.KEY_ROLES, JSON.stringify(roles));
     sessionStorage.setItem(this.KEY_PERMISSIONS, JSON.stringify(permissions));
@@ -84,19 +90,9 @@ export class PermissionService {
     return this.has(code);
   }
 
+  /** Platform Admin — toàn quyền. */
   isAdmin(): boolean {
-    const type = (this.userType || '').toUpperCase().replace(/[\s_-]/g, '');
-    if (type === 'ADMIN' || type === 'SUPERADMIN' || type === 'ADMINISTRATOR' || type === 'OWNER')
-      return true;
-    return this.roles.some((r) => {
-      const upper = (r || '').toUpperCase().replace(/[\s_-]/g, '');
-      return (
-        upper === 'ADMIN' ||
-        upper === 'SUPERADMIN' ||
-        upper === 'ADMINISTRATOR' ||
-        upper === 'OWNER'
-      );
-    });
+    return this.userType === this.SUPER_ADMIN;
   }
 
   private readJsonArray(key: string): string[] {

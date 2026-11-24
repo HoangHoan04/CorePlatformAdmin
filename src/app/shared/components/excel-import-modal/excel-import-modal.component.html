@@ -10,7 +10,7 @@
           <span class="meta-tag"><span nz-icon nzType="hdd"></span> {{ fileSizeFormatted }}</span>
           @if (!parsing && !parseError) {
             <span class="meta-tag highlight">
-              <span nz-icon nzType="table"></span> {{ totalRows }} dòng dữ liệu
+              <span nz-icon nzType="table"></span> {{ 'common.import.rowCount' | translate: { count: totalRows } }}
             </span>
           }
         </div>
@@ -19,7 +19,7 @@
 
     @if (sheetNames.length > 1) {
       <div class="file-summary-right">
-        <span class="sheet-label">Trang tính:</span>
+        <span class="sheet-label">{{ 'common.import.sheet' | translate }}</span>
         <nz-select
           [(ngModel)]="selectedSheet"
           (ngModelChange)="onSheetChange($event)"
@@ -37,7 +37,7 @@
 
   @if (parsing) {
     <div class="state-loading-wrap">
-      <nz-spin nzSimple nzTip="Đang phân tích cấu trúc file Excel..."></nz-spin>
+      <nz-spin nzSimple [nzTip]="'common.import.parsing' | translate"></nz-spin>
     </div>
   }
 
@@ -46,7 +46,7 @@
       <nz-alert
         nzType="error"
         nzShowIcon
-        [nzMessage]="'Lỗi đọc file Excel'"
+        [nzMessage]="'common.import.readError' | translate"
         [nzDescription]="parseError"
       ></nz-alert>
     </div>
@@ -88,15 +88,15 @@
         <div class="result-stats-row">
           <div class="stat-card total">
             <div class="stat-num">{{ importResult.totalRows }}</div>
-            <div class="stat-lbl">Tổng dòng</div>
+            <div class="stat-lbl">{{ 'common.import.totalRows' | translate }}</div>
           </div>
           <div class="stat-card success">
             <div class="stat-num">{{ importResult.successCount }}</div>
-            <div class="stat-lbl">Thành công</div>
+            <div class="stat-lbl">{{ 'common.import.successRows' | translate }}</div>
           </div>
           <div class="stat-card error" [class.has-error]="importResult.errorCount > 0">
             <div class="stat-num">{{ importResult.errorCount }}</div>
-            <div class="stat-lbl">Lỗi / Bỏ qua</div>
+            <div class="stat-lbl">{{ 'common.import.failedRows' | translate }}</div>
           </div>
         </div>
 
@@ -105,10 +105,10 @@
             <div class="errors-box-header">
               <span class="errors-title">
                 <span nz-icon nzType="warning" nzTheme="fill" class="text-warning"></span>
-                Chi tiết các dòng bị lỗi ({{ importResult.errors.length }}):
+                {{ 'common.import.errorDetails' | translate: { count: importResult.errors.length } }}
               </span>
               <button nz-button nzSize="small" nzType="default" (click)="copyErrors()">
-                <span nz-icon nzType="copy"></span> Sao chép lỗi
+                <span nz-icon nzType="copy"></span> {{ 'common.import.copyErrors' | translate }}
               </button>
             </div>
             <div class="errors-list">
@@ -129,12 +129,9 @@
         <div class="preview-header">
           <div class="preview-title">
             <span nz-icon nzType="eye"></span>
-            <span
-              >Xem trước dữ liệu (Trang tính: <strong>{{ selectedSheet }}</strong> -
-              {{ totalRows }} dòng)</span
-            >
+            <span>{{ 'common.import.previewTitle' | translate: { sheet: selectedSheet, count: totalRows } }}</span>
           </div>
-          <div class="preview-note">* Dòng đầu tiên trong file được nhận dạng làm tiêu đề cột</div>
+          <div class="preview-note">{{ 'common.import.headerNote' | translate }}</div>
         </div>
 
         <div class="table-preview-wrapper">
@@ -156,7 +153,7 @@
 
   <div class="modal-footer-actions">
     <button nz-button nzType="default" (click)="closeModal()" [disabled]="importing">
-      {{ importCompleted ? 'Đóng' : 'Hủy bỏ' }}
+      {{ (importCompleted ? 'common.actions.close' : 'common.actions.cancel') | translate }}
     </button>
 
     @if (!importCompleted) {
@@ -170,7 +167,7 @@
         @if (!importing) {
           <span nz-icon nzType="cloud-upload"></span>
         }
-        <span>Xác nhận nhập dữ liệu ({{ totalRows }} dòng)</span>
+        <span>{{ 'common.import.confirm' | translate: { count: totalRows } }}</span>
       </button>
     }
   </div>

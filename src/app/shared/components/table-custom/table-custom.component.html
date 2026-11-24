@@ -57,11 +57,7 @@
                           ></span>
                         }
                         @if (isToolbarActionLoading(sub)) {
-                          <span
-                            nz-icon
-                            nzType="loading"
-                            class="toolbar-dropdown-item-icon"
-                          ></span>
+                          <span nz-icon nzType="loading" class="toolbar-dropdown-item-icon"></span>
                         }
                         <span class="toolbar-dropdown-item-label">{{ sub.label | translate }}</span>
                       </button>
@@ -308,7 +304,7 @@
             >
               <div class="loading-state-wrapper">
                 <span nz-icon nzType="loading" class="animate-spin text-primary"></span>
-                <span class="loading-text">Đang tải dữ liệu...</span>
+                <span class="loading-text">{{ 'common.loading' | translate }}</span>
               </div>
             </td>
           </tr>
@@ -382,13 +378,20 @@
                     <ng-container
                       *ngTemplateOutlet="
                         col.body;
-                        context: { $implicit: rowData, rowIndex: rowIndex }
+                        context: { $implicit: rowData, rowIndex: rowIndex, column: col }
                       "
                     ></ng-container>
                   } @else {
                     @if (!col.type || col.type === 'text') {
+                      <!-- col.render: hiển thị giá trị đã chuyển đổi (VD mã CENTRAL_CITY -> tên loại đã dịch) -->
                       <span>
-                        {{ rowData[col.field] != null ? rowData[col.field] : '-' }}
+                        {{
+                          rowData[col.field] != null
+                            ? col.render
+                              ? col.render(rowData[col.field])
+                              : rowData[col.field]
+                            : '-'
+                        }}
                       </span>
                     } @else if (col.type === 'number') {
                       <span>
@@ -401,9 +404,7 @@
                     } @else if (col.type === 'currency') {
                       <span>
                         {{
-                          rowData[col.field] != null
-                            ? (rowData[col.field] | number: '1.0-0')
-                            : '-'
+                          rowData[col.field] != null ? (rowData[col.field] | number: '1.0-0') : '-'
                         }}
                         {{ col.currencySymbol || '₫' }}
                       </span>
@@ -563,10 +564,7 @@
             class="size-dropdown"
           >
             @for (size of pageSizeOptions; track size) {
-              <nz-option
-                [nzValue]="size.toString()"
-                [nzLabel]="size.toString()"
-              ></nz-option>
+              <nz-option [nzValue]="size.toString()" [nzLabel]="size.toString()"></nz-option>
             }
           </nz-select>
         </div>
